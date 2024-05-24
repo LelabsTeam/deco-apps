@@ -28,8 +28,8 @@ export interface Props {
   type?: OGType;
   /** @description Recommended: 1200 x 630 px (up to 5MB) */
   image?: ImageWidget;
-  /** @description Recommended: 16 x 16 px */
-  favicon?: ImageWidget;
+  // /** @description Recommended: 16 x 16 px */
+  // favicon?: ImageWidget;
   /** @description Suggested color that browsers should use to customize the display of the page or of the surrounding user interface */
   themeColor?: string;
   /** @title Canonical URL */
@@ -51,7 +51,7 @@ function Component({
   descriptionTemplate = "%s",
   type,
   image,
-  favicon,
+  // favicon,
   themeColor,
   canonical,
   noIndexing,
@@ -78,7 +78,7 @@ function Component({
         content={renderTemplateString(descriptionTemplate, description)}
       />
       <meta name="theme-color" content={themeColor} />
-      <link rel="icon" href={favicon ?? "https://casaevideonewio.myvtex.com/arquivos/fav-icon-cev.png"} />
+      {/* <link rel="icon" href={favicon} /> */}
 
       {/* Twitter tags */}
       <meta property="twitter:title" content={title} />
