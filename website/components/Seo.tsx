@@ -78,7 +78,7 @@ function Component({
         content={renderTemplateString(descriptionTemplate, description)}
       />
       <meta name="theme-color" content={themeColor} />
-      <link rel="icon" href={favicon} />
+      <link rel="icon" href={favicon ?? "https://casaevideonewio.myvtex.com/arquivos/fav-icon-cev.png"} />
 
       {/* Twitter tags */}
       <meta property="twitter:title" content={title} />
