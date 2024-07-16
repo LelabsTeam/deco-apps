@@ -61,9 +61,7 @@ function Component({
   const [{ pageInfo = {}, seo = {} } = {}] = jsonLDs || [{}];
 
   const currentPage = pageInfo?.currentPage ?? false;
-  const isDepartament =
-    (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Department") ||
-    (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Search");
+  const isDepartament = jsonLDs[0] ? (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Department") || (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Search") : null;
   const isPageMoreThanOne = currentPage && currentPage > 1;
 
   const twitterCard = type === "website" ? "summary" : "summary_large_image";
