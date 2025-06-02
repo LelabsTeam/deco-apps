@@ -50,6 +50,7 @@ interface Params {
     label: string;
     value: string;
   }[];
+  simulationBehavior: "default" | "skip" | "only1P";
 }
 
 export const withDefaultParams = ({
@@ -60,6 +61,7 @@ export const withDefaultParams = ({
   fuzzy = "auto",
   locale = "pt-BR",
   hideUnavailableItems,
+  simulationBehavior = "default",
 }: Partial<Params>) => ({
   page: page + 1,
   count,
@@ -69,6 +71,7 @@ export const withDefaultParams = ({
   locale,
   // locale: locale ?? ctx.configVTEX!.defaultLocale,
   hideUnavailableItems: hideUnavailableItems ?? false,
+  simulationBehavior,
 });
 
 const IS_ANONYMOUS = Symbol("segment");
