@@ -311,11 +311,6 @@ const loader = async (
   const paramnPage = matchParamPage ? Number(matchParamPage[1]!) : 1;
 
   const segment = getSegmentFromBag(ctx);
-  const {
-    selectedFacets: baseSelectedFacets,
-    page,
-    ...args
-  } = searchArgsOf(props, url);
 
   const aditionalFieldsInQuery: {
     [key in keyof typeof AdditionalParameters | string]?:
