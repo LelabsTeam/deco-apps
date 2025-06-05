@@ -70,6 +70,8 @@ async function loader(
       "@type": "PostalAddress",
       addressCountry: address?.country,
       addressLocality: address?.city,
+      neighborhood: address?.neighborhood,
+      addressNumber: address?.number,
       addressRegion: address?.state,
       postalCode: address?.postalCode,
       streetAddress: address?.street,
