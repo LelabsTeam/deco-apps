@@ -14,6 +14,7 @@ export interface UserMutation {
   tradeName?: string | null;
   businessPhone?: string | null;
   isCorporate?: boolean;
+  customFields?: { key: string; value: string }[];
 }
 
 const updateProfile = async (
@@ -28,9 +29,10 @@ const updateProfile = async (
     console.error("User profile not found or email is missing:", props.email);
     return null;
   }
+
   const mutation = `
-   mutation UpdateProfile($input: ProfileInput!) {
-      updateProfile(fields: $input) @context(provider: "vtex.store-graphql") {
+    mutation UpdateProfile($input: ProfileInput!, $customFields: [CustomFieldInput!]) {
+      updateProfile(fields: $input, customFields: $customFields) @context(provider: "vtex.store-graphql") {
         cacheId
         firstName
         lastName
@@ -45,6 +47,10 @@ const updateProfile = async (
         corporateDocument
         stateRegistration
         isCorporate
+        customFields {
+          key
+          value
+        }
       }
     }
   `;
@@ -52,7 +58,7 @@ const updateProfile = async (
   try {
     const { updateProfile: updatedUser } = await io.query<
       { updateProfile: User },
-      { input: UserMutation }
+      { input: UserMutation; customFields?: { key: string; value: string }[] }
     >(
       {
         query: mutation,
@@ -62,6 +68,7 @@ const updateProfile = async (
             ...props,
             email: props.email,
           },
+          customFields: props.customFields ?? [],
         },
       },
       { headers: { cookie } },

@@ -33,8 +33,31 @@ async function loader(
     return null;
   }
 
-  const query =
-    `query getUserProfile { profile(customFields: "isNewsletterOptIn") { id userId email firstName lastName profilePicture gender document homePhone birthDate corporateDocument corporateName tradeName businessPhone isCorporate customFields { key value } }}`;
+const query = `
+  query getUserProfile {
+    profile(customFields: "isNewsletterOptIn,cartAbandoned") {
+      id
+      userId
+      email
+      firstName
+      lastName
+      profilePicture
+      gender
+      document
+      homePhone
+      birthDate
+      corporateDocument
+      corporateName
+      tradeName
+      businessPhone
+      isCorporate
+      customFields {
+        key
+        value
+      }
+    }
+  }
+`;
 
   try {
     const { profile: user } = await io.query<{ profile: User }, null>(
