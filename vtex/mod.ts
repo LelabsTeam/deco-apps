@@ -89,6 +89,10 @@ export interface Props {
    * @title Skip Simulation Behavior
    */
   skipSimulationBehavior?: Matcher;
+
+  advancedConfigs?: {
+    doNotFetchVariantsForRelatedProducts?: boolean;
+  }
 }
 export const color = 0xf71963;
 /**
