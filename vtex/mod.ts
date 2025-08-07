@@ -129,7 +129,7 @@ export default function VTEX(
   });
   const io = createGraphqlClient({
     endpoint:
-      `https://${account}.myvtex.com/`,
+      `https://${account}.myvtex.com/api/io/_v/private/graphql/v1`,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
