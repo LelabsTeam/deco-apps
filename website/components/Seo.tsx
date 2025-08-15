@@ -108,7 +108,7 @@ function Component({
       {canonical && (
         <link
           rel="canonical"
-          href={isDepartament ? processedSeoCanonicalUrl : url}
+          href={isDepartament ? processedSeoCanonicalUrl.replace(/\/[^\/]+\.[^\/]+?\//, "/") : url?.replace(/\/[^\/]+\.[^\/]+?\//, "/")}
         />
       )}
 
