@@ -154,8 +154,8 @@ function toCanonical(url: URL, page?: number) {
   if (typeof page === "number") {
     url.searchParams.set("page", `${page}`);
   }
-
-  return url.href.replace(/\/[^\/]+\.[^\/]+?\//, "/");
+  const regex = /casaevideonewio\.myvtex\.com\/|lebiscuit\.myvtex\.com\//;
+  return url.href.replace(regex, "");
 }
 
 /**
