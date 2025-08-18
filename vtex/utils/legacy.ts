@@ -111,10 +111,14 @@ export const pageTypesToSeo = (
   currentPage?: number,
 ): Seo | null => {
   const current = pages.at(-1);
+  console.log("aqui - current:", current);
   const url = new URL(baseUrl);
+  console.log("aqui - url:", url);
   const fullTextSearch = url.searchParams.get("q");
+  console.log("aqui - fullTextSearch:", fullTextSearch);
 
   const canonical = `https://${url.host + url.pathname}`;
+  console.log("aqui - canonical:", canonical);
 
   if (
     (!current || current.pageType === "Search" ||
@@ -156,7 +160,7 @@ function toCanonical(url: URL, page?: number) {
     url.searchParams.set("page", `${page}`);
   }
 
-  return url.href;
+  return url.href.replace(/\/[^\/]+\.[^\/]+?\//, "/");
 }
 
 /**
