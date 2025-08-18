@@ -131,6 +131,8 @@ export const pageTypesToSeo = (
     return null;
   }
 
+  const regexBadDomain = /casaevideonewio\.myvtex\.com\/|lebiscuit\.myvtex\.com\/|.+\.vtexcommercestable\.com\.br\//;
+
   return {
     title: current.title || current.name || "",
     description: current.metaTagDescription!,
@@ -139,7 +141,7 @@ export const pageTypesToSeo = (
       new URL(
         (current.url && current.pageType !== "Collection" &&
             current.pageType !== "Brand")
-          ? current.url.replace(/.+\.vtexcommercestable\.com\.br/, "")
+          ? current.url.replace(regexBadDomain, "")
             .toLowerCase()
           : url,
         url,
@@ -154,8 +156,7 @@ function toCanonical(url: URL, page?: number) {
   if (typeof page === "number") {
     url.searchParams.set("page", `${page}`);
   }
-  const regex = /casaevideonewio\.myvtex\.com\/|lebiscuit\.myvtex\.com\//;
-  return url.href.replace(regex, "");
+  return url.href
 }
 
 /**
