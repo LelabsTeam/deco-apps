@@ -89,6 +89,10 @@ export interface Props {
    * @title Skip Simulation Behavior
    */
   skipSimulationBehavior?: Matcher;
+
+  advancedConfigs?: {
+    doNotFetchVariantsForRelatedProducts?: boolean;
+  }
 }
 export const color = 0xf71963;
 /**
@@ -123,18 +127,18 @@ export default function VTEX(
     fetcher: fetchSafe,
   });
   const vcsDeprecated = createHttpClient<VTEXCommerceStable>({
-    base: `https://${account}.vtexcommercestable.com.br`,
+    base: `https://${account}.myvtex.com/`,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
   const io = createGraphqlClient({
     endpoint:
-      `https://${account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
+      `https://${account}.myvtex.com/api/io/_v/private/graphql/v1`,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
   const vcs = createHttpClient<VCS>({
-    base: `https://${account}.vtexcommercestable.com.br`,
+    base: `https://${account}.myvtex.com/`,
     fetcher: fetchSafe,
     processHeaders: removeDirtyCookies,
     headers: headers,

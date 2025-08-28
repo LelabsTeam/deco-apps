@@ -49,8 +49,11 @@ export const fetchSafe = async (
     return response;
   }
 
-  logger.error(`error sending request for url: ${input}, body error is: ${await response.text()}`)
-  throw new HttpError(response.status, `${await response.text()}`);
+  const responseText = await response.text();
+  logger.error(
+    `error sending request for url: ${input}, body error is: ${responseText}`,
+  );
+  throw new HttpError(response.status, `${responseText}`);
 };
 export const fetchAPI = async <T>(
   input: string | Request | URL,

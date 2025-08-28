@@ -113,7 +113,6 @@ export const pageTypesToSeo = (
   const current = pages.at(-1);
   const url = new URL(baseUrl);
   const fullTextSearch = url.searchParams.get("q");
-
   const canonical = `https://${url.host + url.pathname}`;
 
   if (
@@ -132,6 +131,8 @@ export const pageTypesToSeo = (
     return null;
   }
 
+  const regexBadDomain = /casaevideonewio\.myvtex\.com\/|lebiscuit\.myvtex\.com\/|.+\.vtexcommercestable\.com\.br\//;
+
   return {
     title: current.title || current.name || "",
     description: current.metaTagDescription!,
@@ -140,7 +141,7 @@ export const pageTypesToSeo = (
       new URL(
         (current.url && current.pageType !== "Collection" &&
             current.pageType !== "Brand")
-          ? current.url.replace(/.+\.vtexcommercestable\.com\.br/, "")
+          ? current.url.replace(regexBadDomain, "")
             .toLowerCase()
           : url,
         url,
@@ -155,8 +156,7 @@ function toCanonical(url: URL, page?: number) {
   if (typeof page === "number") {
     url.searchParams.set("page", `${page}`);
   }
-
-  return url.href;
+  return url.href
 }
 
 /**
