@@ -141,7 +141,7 @@ export const pageTypesToSeo = (
       new URL(
         (current.url && current.pageType !== "Collection" &&
             current.pageType !== "Brand")
-          ? current.url.replace(regexBadDomain, "")
+          ? `https://${url.host}/` + current.url.replace(regexBadDomain, "") 
             .toLowerCase()
           : url,
         url,
