@@ -8,6 +8,7 @@ import { fetchSafe } from "./utils/fetchVTEX.ts";
 import { OpenAPI as VCS } from "./utils/openapi/vcs.openapi.gen.ts";
 import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
 import { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
+import { OpenAPI as VPAY } from "./utils/openapi/payments.openapi.gen.ts";
 import { Segment } from "./utils/types.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import { removeDirtyCookies } from "../utils/normalize.ts";
@@ -64,7 +65,6 @@ export interface Props {
   /**
    * @title Default Sales Channel
    * @description (Use defaultSegment instead)
-   * @default 1
    * @deprecated
    */
   salesChannel?: string;
@@ -96,15 +96,19 @@ export interface Props {
 }
 export const color = 0xf71963;
 /**
- * @name VTEX
+ * @appName vtex
  * @title VTEX
  * @description Power your store with product, inventory, and checkout tools from VTEX.
  * @category Ecommmerce
  * @logo https://assets.decocache.com/mcp/0d6e795b-cefd-4853-9a51-93b346c52c3f/VTEX.svg
  */
 export default function VTEX(
-  { appKey, appToken, account, publicUrl, salesChannel, ...props }: Props,
+  { appKey, appToken, account, publicUrl: _publicUrl, salesChannel, ...props }:
+    Props,
 ) {
+  const publicUrl = _publicUrl.startsWith("https://")
+    ? _publicUrl
+    : `https://${_publicUrl}`;
   const headers = new Headers();
   appKey &&
     headers.set(
@@ -131,6 +135,9 @@ export default function VTEX(
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
+  const ioUrl = publicUrl.endsWith("/")
+    ? `${publicUrl}api/io/_v/private/graphql/v1`
+    : `${publicUrl}/api/io/_v/private/graphql/v1`;
   const io = createGraphqlClient({
     endpoint:
       `https://${account}.myvtex.com/api/io/_v/private/graphql/v1`,
@@ -149,6 +156,12 @@ export default function VTEX(
     processHeaders: removeDirtyCookies,
     headers: headers,
   });
+  const vpay = createHttpClient<VPAY>({
+    base: `https://${account}.vtexpayments.com.br`,
+    fetcher: fetchSafe,
+    processHeaders: removeDirtyCookies,
+    headers: headers,
+  });
   const state = {
     ...props,
     salesChannel: salesChannel ?? "1",
@@ -160,6 +173,7 @@ export default function VTEX(
     vcs,
     my,
     api,
+    vpay,
   };
   const app: A<Manifest, typeof state, [
     ReturnType<typeof workflow>,

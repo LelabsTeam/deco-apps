@@ -34,6 +34,7 @@ export const GoogleProvider: OAuthProvider = {
   scopes: SCOPES,
   clientId: "",
   clientSecret: "",
+  grant_type: "refresh_token",
 };
 
 export interface Props {
@@ -52,6 +53,7 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Google Gmail
+ * @appName google-gmail
  * @description Send and retrieve messages from your Gmail inbox.
  * @category Produtividade
  * @logo https://assets.decocache.com/mcp/b4dbd04f-2d03-4e29-a881-f924f5946c4e/Gmail.svg

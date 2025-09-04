@@ -19,7 +19,7 @@ export interface State extends Props {
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
- * @name GitHub
+ * @appName github
  * @title GitHub
  * @description Create and manage issues, repositories, and pull requests.
  * @logo https://assets.decocache.com/mcp/02e06fe6-a820-4c42-b960-bce022362702/GitHub.svg
@@ -30,8 +30,9 @@ export default function App(props: Props): App<Manifest, State> {
   const client = createHttpClient<Client>({
     base: GITHUB_URL,
     headers: new Headers({
-      "Accept": "application/json",
+      "Accept": "application/vnd.github+json",
       "Content-Type": "application/json",
+      "X-GitHub-Api-Version": "2022-11-28",
       ...(access_token
         ? {
           "Authorization": `Bearer ${access_token}`,

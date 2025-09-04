@@ -632,6 +632,10 @@ export interface PostalAddress extends Omit<ContactPoint, "@type"> {
   postalCode?: string;
   /** The street address. For example, 1600 Amphitheatre Pkwy. */
   streetAddress?: string;
+  /** The latitude of a location. For example 37.42242 (WGS 84). */
+  latitude?: number;
+  /** The longitude of a location. For example -122.08585 (WGS 84). */
+  longitude?: number;
 }
 
 export interface PostalAddressVTEX extends Omit<ContactPoint, "@type"> {
