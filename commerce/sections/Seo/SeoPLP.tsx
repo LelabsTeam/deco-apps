@@ -17,10 +17,10 @@ function Section({ jsonLD, ...props }: Props) {
   const canonical = props.canonical
     ? props.canonical
     : jsonLD?.seo?.canonical
-    ? jsonLD.seo.canonical
-    : jsonLD?.breadcrumb
-    ? canonicalFromBreadcrumblist(jsonLD?.breadcrumb)
-    : undefined;
+      ? jsonLD.seo.canonical
+      : jsonLD?.breadcrumb
+        ? canonicalFromBreadcrumblist(jsonLD?.breadcrumb)
+        : undefined;
 
   const noIndexing = props.noIndexing ||
     jsonLD?.seo?.noIndexing ||
@@ -43,14 +43,14 @@ function Section({ jsonLD, ...props }: Props) {
     ];
 
     if (Array.isArray(obj)) {
-      return obj.map((item) => sanitizeObj(item)) as T;
+      return obj.map(item => sanitizeObj(item)) as T;
     }
 
-    if (typeof obj === "object" && obj !== null) {
+    if (typeof obj === 'object' && obj !== null) {
       return Object.fromEntries(
         Object.entries(obj)
           .filter(([key]) => !propsToRemove.includes(key))
-          .map(([key, value]) => [key, sanitizeObj(value)]),
+          .map(([key, value]) => [key, sanitizeObj(value)])
       ) as T;
     }
 
@@ -58,44 +58,123 @@ function Section({ jsonLD, ...props }: Props) {
   }
 
   function formatProductListing(data: ProductListingPage | null) {
-    if (!data) return null;
+    if (!data || !data.products || data.products.length === 0) return null;
 
-    const itemListElement: ProductListingPageListItem[] = data.products.reduce(
-      (accu: ProductListingPageListItem[], product, index) => {
-        accu.push({
-          "@type": "ListItem",
+    
+    const itemListElement: ProductListingPageListItem[] = data.products
+      .filter(product => product && product.sku) 
+      .map((product, index) => {
+        
+        const sanitizedProduct = sanitizeObj(product);
+        
+        
+        if (typeof sanitizedProduct === 'object' && sanitizedProduct !== null) {
+          
+          const productWithDefaults = {
+            ...sanitizedProduct,
+            "@type": sanitizedProduct["@type"] || "Product",
+            
+            url: sanitizedProduct.url || `#product-${product.sku}`
+          };
+          
+          return {
+            "@type": "ListItem" as const,
+            position: index + 1,
+            item: productWithDefaults
+          };
+        }
+        
+        return {
+          "@type": "ListItem" as const,
           position: index + 1,
-          item: sanitizeObj(product),
-        });
-        return accu;
-      },
-      [],
-    );
+          item: sanitizedProduct
+        };
+      });
 
+    
     return {
-      "@type": "ItemList",
-      "itemListElement": itemListElement,
+      "@context": "https://schema.org",
+      "@type": "ItemList" as const,
+      "numberOfItems": itemListElement.length,
+      "itemListElement": itemListElement
     };
   }
 
   function formatBreadCrumb(data: ProductListingPage | null) {
-    if (!data) return null;
+    if (!data || !data.breadcrumb || !data.breadcrumb.itemListElement) return null;
 
+    
+    const validItems = data.breadcrumb.itemListElement
+      .filter(item => item && item.name && item.item) 
+      .map((item, index) => ({
+        "@type": "ListItem" as const,
+        position: index + 1,
+        name: item.name,
+        item: item.item
+      }));
+
+    if (validItems.length === 0) return null;
+
+    
     return {
-      "@type": "BreadcrumbList",
-      "itemListElement": data.breadcrumb.itemListElement,
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList" as const,
+      "itemListElement": validItems
     };
   }
 
   function formatNewJsonLd(data: ProductListingPage | null) {
-    const items = [formatProductListing(data), formatBreadCrumb(data)].filter((
-      item,
-    ) => item !== null && item !== undefined);
+    if (!data) return [];
 
-    return [{ ...items, pageInfo: jsonLD?.pageInfo, seo: jsonLD?.seo }];
+   
+    const jsonLdArray = [];
+    
+    
+    const productList = formatProductListing(data);
+    if (productList) {
+      jsonLdArray.push(productList);
+    }
+    
+    
+    const breadcrumb = formatBreadCrumb(data);
+    if (breadcrumb) {
+      jsonLdArray.push(breadcrumb);
+    }
+    
+    
+    if (jsonLdArray.length > 0 && (data.seo || data.pageInfo)) {
+      const webPageSchema = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage", 
+        ...(data.seo?.title && { "name": data.seo.title }),
+        ...(data.seo?.description && { "description": data.seo.description }),
+        ...(data.seo?.canonical && { "url": data.seo.canonical }),
+    
+        ...(productList && { "mainEntity": productList }),
+        ...(breadcrumb && { "breadcrumb": breadcrumb })
+      };
+      
+     
+      return [webPageSchema];
+    }
+    
+    return jsonLdArray;
   }
 
+  
   const newJsonLd = formatNewJsonLd(jsonLD);
+  
+ 
+  const validJsonLd = newJsonLd.filter(item => {
+    try {
+      
+      JSON.stringify(item);
+      return true;
+    } catch {
+      console.error("Invalid JSON-LD item:", item);
+      return false;
+    }
+  });
 
   return (
     <Seo
@@ -103,7 +182,7 @@ function Section({ jsonLD, ...props }: Props) {
       title={title || props.title}
       description={description || props.description}
       canonical={canonical}
-      jsonLDs={newJsonLd}
+      jsonLDs={validJsonLd}
       noIndexing={noIndexing}
     />
   );
