@@ -27,13 +27,57 @@ const action = async (
   const cookie = req.headers.get("cookie") ?? "";
   const segment = getSegmentFromBag(ctx);
 
+  let finalBody = { expectedOrderFormSections, ...body };
+  
+  try {
+    const currentResponse = await vcsDeprecated
+      ["GET /api/checkout/pub/orderForm/:orderFormId"]({
+        orderFormId,
+      }, {
+        headers: { 
+          cookie,
+          accept: "application/json",
+        },
+      });
+    
+    if (currentResponse.ok) {
+      const currentOrderForm = await currentResponse.json();
+      
+      if (currentOrderForm?.marketingData) {
+        const currentMd = currentOrderForm.marketingData;
+        
+      
+        if (attachment === "marketingData") {
+          
+          finalBody = {
+            ...finalBody,
+            utmSource: body.utmSource || currentMd.utmSource,
+            utmMedium: body.utmMedium || currentMd.utmMedium,
+            utmCampaign: body.utmCampaign || currentMd.utmCampaign,
+            utmipage: body.utmipage || currentMd.utmipage,
+            utmiPart: body.utmiPart || currentMd.utmiPart,
+            utmiCampaign: body.utmiCampaign || currentMd.utmiCampaign,
+            coupon: body.coupon || currentMd.coupon,
+          };
+        } else {
+         
+          if (currentMd.utmSource || currentMd.utmMedium || currentMd.utmCampaign || currentMd.coupon) {
+            finalBody.marketingData = currentMd;
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error(error)
+  }
+
   const response = await vcsDeprecated
     ["POST /api/checkout/pub/orderForm/:orderFormId/attachments/:attachment"]({
       orderFormId,
       attachment,
       sc: segment?.payload.channel,
     }, {
-      body: { expectedOrderFormSections, ...body },
+      body: finalBody,
       headers: {
         accept: "application/json",
         "content-type": "application/json",
