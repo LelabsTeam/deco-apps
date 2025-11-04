@@ -33,16 +33,21 @@ const action = async (
   const cookie = req.headers.get("cookie") ?? "";
   const segment = getSegmentFromBag(ctx);
 
+  const { utm_campaign, utm_medium, utm_source } = segment?.payload ?? {};
+
   const response = await vcsDeprecated
     ["POST /api/checkout/pub/orderForm/:orderFormId/items/update"]({
       orderFormId,
       allowedOutdatedData,
       sc: segment?.payload.channel,
+      utm_campaign,
+      utm_medium,
+      utm_source,
     }, {
       body: { orderItems, noSplitItem: Boolean(noSplitItem) },
       headers: {
         "content-type": "application/json",
-        accept: "application/json",
+        "accept": "application/json",
         cookie,
       },
     });

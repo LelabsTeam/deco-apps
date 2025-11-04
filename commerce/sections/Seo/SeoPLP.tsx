@@ -21,6 +21,7 @@ function Section({ jsonLD, ...props }: Props) {
     : jsonLD?.breadcrumb
     ? canonicalFromBreadcrumblist(jsonLD?.breadcrumb)
     : undefined;
+  console.log("aqui - canonical:", canonical);
 
   const noIndexing = props.noIndexing ||
     jsonLD?.seo?.noIndexing ||
