@@ -9,6 +9,7 @@ import { OpenAPI as VCS } from "./utils/openapi/vcs.openapi.gen.ts";
 import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
 import { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
 import { OpenAPI as VPAY } from "./utils/openapi/payments.openapi.gen.ts";
+import { OpenAPI as SUB } from "./utils/openapi/subscriptions.openapi.gen.ts";
 import { Segment } from "./utils/types.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import { removeDirtyCookies } from "../utils/normalize.ts";
@@ -106,7 +107,7 @@ export default function VTEX(
   { appKey, appToken, account, publicUrl: _publicUrl, salesChannel, ...props }:
     Props,
 ) {
-  const publicUrl = _publicUrl.startsWith("https://")
+  const publicUrl = _publicUrl?.startsWith("https://")
     ? _publicUrl
     : `https://${_publicUrl}`;
   const headers = new Headers();
@@ -162,6 +163,13 @@ export default function VTEX(
     processHeaders: removeDirtyCookies,
     headers: headers,
   });
+  const sub = createHttpClient<SUB>({
+    base: `https://${account}.vtexcommercestable.com.br`,
+    processHeaders: removeDirtyCookies,
+    fetcher: fetchSafe,
+    headers: headers,
+  });
+
   const state = {
     ...props,
     salesChannel: salesChannel ?? "1",
@@ -174,6 +182,7 @@ export default function VTEX(
     my,
     api,
     vpay,
+    sub,
   };
   const app: A<Manifest, typeof state, [
     ReturnType<typeof workflow>,
