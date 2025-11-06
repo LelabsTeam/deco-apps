@@ -159,18 +159,20 @@ export const loader = async (
 ) => {
   const url = new URL(req.url);
   const devMode = url.searchParams.has("__d");
+  const appMode = url.searchParams.has("__app");
   const unindexedDomain = noIndexedDomains.some((domain) =>
     url.origin.includes(domain)
   );
   const global = ctx.global || [];
-  const resolvedGlobals = await Promise.all(
+  const resolvedGlobals = appMode ? [] : await Promise.all(
     global?.map(async (section) => {
       return await ctx.get(section, {
         resolveChain: [{ value: ctx.resolverId ?? "root", type: "resolver" }],
       });
     }),
   );
-  const globalSections = ctx.theme
+  
+  const globalSections = appMode ? [] : ctx.theme
     ? [ctx.theme, ...resolvedGlobals]
     : resolvedGlobals;
 
