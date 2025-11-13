@@ -21,3 +21,7 @@ export default async function loader(
 }
 
 export const cache = "stale-while-revalidate";
+
+export const cacheKey = (_props: unknown, _req: Request, _ctx: AppContext) => {
+  return "pickup-points-all";
+};

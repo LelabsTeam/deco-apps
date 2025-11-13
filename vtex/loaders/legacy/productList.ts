@@ -285,8 +285,13 @@ export const cacheKey = (
 
   const url = new URL(req.url);
 
-  // Avoid cache on loader call over call as it should be handled by the caller
-  if (ctx.isInvoke) {
+  const searchTerm = url.searchParams.get("q");
+  const cachedSearchTerms = ctx.cachedSearchTerms ?? [];
+  if (
+    // Avoid cache on loader call over call and on search pages
+    (!isTermProps(props) && searchTerm &&
+      !cachedSearchTerms.includes(searchTerm)) || ctx.isInvoke
+  ) {
     return null;
   }
 
