@@ -474,8 +474,8 @@ const loader = async (
       : `${url.pathname}/page${paramnPage + 1}${queryParamns}   `;
   };
 
-  const pageIndex = Array.from(currentSearchParams.keys()).some(paramn => DISABLED_QUERY_PARAMS.includes(paramn))
-  
+  const pageIndex = Array.from(currentSearchParams.keys()).some(key => key.split(".").some(paramn => DISABLED_QUERY_PARAMS.includes(paramn)));
+    
   return {
     "@type": "ItemList",
     breadcrumb: {
