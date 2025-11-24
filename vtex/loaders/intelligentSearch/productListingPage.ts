@@ -220,6 +220,9 @@ const searchArgsOf = (props: Props, url: URL, ctx: AppContext) => {
     simulationBehavior,
   };
 };
+
+const DISABLED_QUERY_PARAMS = ["filter", "sort", "term", "map", "q", "page"];
+
 const PAGE_TYPE_TO_MAP_PARAM = {
   Brand: "brand",
   Collection: "productClusterIds",
@@ -459,7 +462,6 @@ const loader = async (
   const hasNextPage = Boolean(pagination.next.proxyUrl);
   const hasPreviousPage = paramnPage > 1;
   const currentSearchParams = new URLSearchParams(url.searchParams);
-
   const getPageUrl = (value: number) => {
     const pageCurrentExist = url.pathname.match(PAGE_REGEX);
     const queryParamns = currentSearchParams.toString()
@@ -472,6 +474,8 @@ const loader = async (
       : `${url.pathname}/page${paramnPage + 1}${queryParamns}   `;
   };
 
+  const pageIndex = Array.from(currentSearchParams.keys()).some(key => key.split(".").some(paramn => DISABLED_QUERY_PARAMS.includes(paramn)));
+    
   return {
     "@type": "ItemList",
     breadcrumb: {
@@ -491,11 +495,12 @@ const loader = async (
       pageTypes: allPageTypes.map(parsePageType),
     },
     sortOptions,
-    seo: safeJsonSerialize(pageTypesToSeo(
+    seo: {...safeJsonSerialize(pageTypesToSeo(
       currentPageTypes,
       baseUrl,
       hasPreviousPage ? paramnPage : undefined,
-    )),
+    )), 
+    noIndexing: pageIndex},
   };
 };
 export const cache = "stale-while-revalidate";
