@@ -34,9 +34,9 @@ const snippet = () => {
     ...rest,
     quantity,
     discount: rounded(discount),
-    price: rounded(price + discount),
+    price: rounded(price),
   });
-  const fixIndex = ({ index, ...rest }: any) => ({ ...rest, index: index + 1 });
+  const fixIndex = ({ index, ...rest }: any) => ({ ...rest, index: index });
   globalThis.window.DECO.events.subscribe((event) => {
     if (!event) {
       return;
