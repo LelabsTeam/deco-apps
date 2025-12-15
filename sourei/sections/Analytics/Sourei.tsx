@@ -36,26 +36,29 @@ const snippet = () => {
     discount: rounded(discount),
     price: rounded(price),
   });
-  const fixIndex = ({ index, ...rest }: any) => ({ ...rest, index: index });
-  globalThis.window.DECO.events.subscribe((event) => {
-    if (!event) {
-      return;
-    }
-    if (event.name === "deco") {
-      globalThis.window.dataLayer.push(event);
-      return;
-    }
-    const ecommerce: any = { ...event.params };
-    if (ecommerce && Array.isArray(ecommerce.items)) {
-      ecommerce.items = ecommerce.items.map(fixId).map(fixPrices).map(fixIndex);
-    }
-    if (typeof ecommerce.value === "number") {
-      ecommerce.value = rounded(ecommerce.value);
-    }
-    globalThis.window.dataLayer.push({ ecommerce: null });
-    globalThis.window.dataLayer.push({ event: event.name, ecommerce });
-  });
-};
+globalThis.window.DECO.events.subscribe((event) => {
+  if (!event) {
+    return;
+  }
+
+  if (event.name === "deco") {
+    globalThis.window.dataLayer.push(event);
+    return;
+  }
+  const ecommerce: any = { ...event.params };
+
+  if (ecommerce && Array.isArray(ecommerce.items)) {
+    ecommerce.items = ecommerce.items
+      .map(fixId)
+      .map(fixPrices);
+  }
+  if (typeof ecommerce.value === "number") {
+    ecommerce.value = rounded(ecommerce.value);
+  }
+  globalThis.window.dataLayer.push({ ecommerce: null });
+  globalThis.window.dataLayer.push({ event: event.name, ecommerce });
+});
+  
 function Section(
   { gtmId, hostname = "https://www.googletagmanager.com", loading = "defer" }:
     Props,
