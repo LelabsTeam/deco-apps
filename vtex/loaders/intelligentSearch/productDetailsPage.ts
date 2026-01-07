@@ -16,7 +16,6 @@ import type {
   PageType,
   Product as VTEXProduct,
 } from "../../utils/types.ts";
-import { LegacyProduct } from "../../utils/types.ts";
 import PDPDefaultPath from "../paths/PDPDefaultPath.ts";
 
 export interface Props {
@@ -76,11 +75,9 @@ const loader = async (
   const locale = segment?.payload?.cultureInfo ??
     ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
-  const pageTypePromise = vcsDeprecated
-    ["GET /api/catalog_system/pub/portal/pagetype/:term"](
-      { term: `${lowercaseSlug}/p` },
-      STALE,
-    ).then((res) => res.json());
+  const pageTypePromise = ctx.invoke("vtex/loaders/legacy/pageType.ts", {
+    term: `${lowercaseSlug}/p`,
+  });
 
   const url = new URL(baseUrl);
   const skuId = url.searchParams.get("skuId") || url.searchParams.get("idsku");

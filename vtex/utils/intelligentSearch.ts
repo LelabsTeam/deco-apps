@@ -1,6 +1,5 @@
 import { setCookie } from "std/http/mod.ts";
 import { AppContext } from "../mod.ts";
-import { STALE } from "../../utils/fetch.ts";
 import type {
   SelectedFacet,
   SimulationBehavior,
@@ -161,13 +160,11 @@ export const pageTypesFromUrl = async (
   ctx: AppContext,
 ) => {
   const segments = segmentsFromSearchParams(url);
-  const { vcsDeprecated } = ctx;
 
   return await Promise.all(
-    segments.map((_, index) =>
-      vcsDeprecated["GET /api/catalog_system/pub/portal/pagetype/:term"]({
-        term: segments.slice(0, index + 1).join("/"),
-      }, STALE).then((res) => res.json())
-    ),
+    segments.map((_, index) => {
+      const term = segments.slice(0, index + 1).join("/");
+      return ctx.invoke("vtex/loaders/legacy/pageType.ts", { term });
+    }),
   );
 };
