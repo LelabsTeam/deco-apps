@@ -291,11 +291,6 @@ const selectPriceFacet = (facets: Facet[], selectedFacets: SelectedFacet[]) => {
   }
   return facets;
 };
-
-const hasInvalidCategorySegment = (allPageTypes: PageType[]): boolean => {
-  return allPageTypes.some((pageType) => pageType.pageType === "NotFound");
-};
-
 /**
  * @title Product Listing Page - Intelligent Search
  * @description List a product listing page, with products, filters, sort and SEO data, commonly used for category, search, brand and collection pages.
@@ -339,12 +334,6 @@ const loader = async (
   }
 
   const allPageTypes = await pageTypesFromUrl(pathToUse, ctx);
-
-  if (hasInvalidCategorySegment(allPageTypes)) {
-    
-    return null;
-  }
-
   const pageTypes = getValidTypesFromPageTypes(allPageTypes);
 
   const selectedFacets = baseSelectedFacets.length === 0
