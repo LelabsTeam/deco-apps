@@ -59,10 +59,9 @@ async function loader(
     }
 
     if (slug) {
-      const pageType = await vcsDeprecated
-        ["GET /api/catalog_system/pub/portal/pagetype/:term"]({
-          term: `${slug}/p`,
-        }, STALE).then((res) => res.json());
+      const pageType = await ctx.invoke("vtex/loaders/legacy/pageType.ts", {
+        term: `${slug}/p`,
+      });
 
       // Page type doesn't exists or this is not product page
       if (pageType?.pageType === "Product") {

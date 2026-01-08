@@ -42,14 +42,12 @@ export const pageTypesFromPathname = async (
   ctx: AppContext,
 ) => {
   const segments = segmentsFromTerm(term);
-  const { vcsDeprecated } = ctx;
 
   return await Promise.all(
-    segments.map((_, index) =>
-      vcsDeprecated["GET /api/catalog_system/pub/portal/pagetype/:term"]({
-        term: segments.slice(0, index + 1).join("/"),
-      }, STALE).then((res) => res.json())
-    ),
+    segments.map((_, index) => {
+      const termPath = segments.slice(0, index + 1).join("/");
+      return ctx.invoke("vtex/loaders/legacy/pageType.ts", { term: termPath });
+    }),
   );
 };
 
