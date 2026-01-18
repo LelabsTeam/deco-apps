@@ -218,10 +218,26 @@ export const getEarlyHintFromSrcProps = (srcProps: {
   return earlyHintParts.join("; ");
 };
 
+const isSvg = (src: string) => src?.toLowerCase().endsWith(".svg");
+
 const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
   const { preload, loading = "lazy" } = props;
 
-  if (!props.height) {
+  // SVGs are vector graphics and don't need raster optimization
+  if (isSvg(props.src)) {
+    return (
+      <img
+        {...props}
+        data-fresh-disable-lock
+        preload={undefined}
+        src={props.src}
+        loading={loading}
+        ref={ref}
+      />
+    );
+  }
+
+  if (!props.height && canShowWarning()) {
     console.warn(
       `Missing height. This image will NOT be optimized: ${props.src}`,
     );
