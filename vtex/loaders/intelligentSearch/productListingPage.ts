@@ -195,13 +195,12 @@ const searchArgsOf = (props: Props, url: URL, ctx: AppContext) => {
         : 0,
       VTEX_MAX_PAGES - currentPageoffset,
     );
-  let sort = (url.searchParams.get("sort") as Sort) ??
+  const sort = (url.searchParams.get("sort")) ??
     LEGACY_TO_IS[url.searchParams.get("O") ?? ""] ??
     props.sort ??
     sortOptions[0].value;
-  if (!sort || !sortValues.includes(sort)) {
-    sort = sortOptions[0].value as Sort;
-  }
+
+  const isSortValid = sortOptions.some((option) => option.value === sort);
   const selectedFacets = mergeFacets(
     props.selectedFacets ?? [],
     filtersFromURL(url),
@@ -213,7 +212,7 @@ const searchArgsOf = (props: Props, url: URL, ctx: AppContext) => {
     query,
     fuzzy,
     page,
-    sort,
+    sort: isSortValid ? (sort as Sort) : sortOptions[0].value as Sort,
     count,
     hideUnavailableItems,
     selectedFacets,
@@ -508,7 +507,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(props.pageHref || req.url);
   const searchTerm = url.searchParams.get("q");
   const cachedSearchTerms = ctx.cachedSearchTerms ?? [];
-  if (searchTerm && !cachedSearchTerms.includes(searchTerm)) {
+  if (searchTerm && !cachedSearchTerms.includes(searchTerm.toLowerCase())) {
     return null;
   }
   const segment = getSegmentFromBag(ctx)?.token ?? "";

@@ -738,6 +738,10 @@ searchParams: {
  */
 _fields?: string
 /**
+ * Name of the [schema](https://developers.vtex.com/docs/guides/master-data-schema-lifecycle) that the document complies with.  This field is required when using `_where` or `_fields` query parameters.
+ */
+_schema?: string
+/**
  * Specification of filters.
  */
 _where?: string
@@ -862,6 +866,12 @@ to?: number
  * Create a new document
  */
 "POST /api/dataentities/:acronym/documents": {
+searchParams: {
+/**
+ * Name of the [schema](https://developers.vtex.com/docs/guides/master-data-schema-lifecycle) that the document complies with.  This field is required when using `_where` or `_fields` query parameters.
+ */
+_schema?: string
+}
 body: {
 anyProperty?: string
 }
@@ -891,6 +901,12 @@ DocumentId?: string
  * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
  */
 "PATCH /api/dataentities/:acronym/documents": {
+searchParams: {
+/**
+ * Name of the [schema](https://developers.vtex.com/docs/guides/master-data-schema-lifecycle) that the document complies with.  This field is required when using `_where` or `_fields` query parameters.
+ */
+_schema?: string
+}
 body: {
 /**
  * Unique identifier of the document to be created.
@@ -928,6 +944,10 @@ searchParams: {
  * Names of the fields that will be returned per document, separated by a comma `,`. It is possible to fetch all fields using `_all` as the value of this query parameter. However, in order to avoid permission errors, we strongly recommend informing only the names of the exact fields that will be used.
  */
 _fields?: string
+/**
+ * Name of the [schema](https://developers.vtex.com/docs/guides/master-data-schema-lifecycle) that the document complies with.  This field is required when using `_where` or `_fields` query parameters.
+ */
+_schema?: string
 }
 response: Document
 }
@@ -976,6 +996,12 @@ response: Document
  * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
  */
 "PUT /api/dataentities/:acronym/documents/:id": {
+searchParams: {
+/**
+ * Name of the [schema](https://developers.vtex.com/docs/guides/master-data-schema-lifecycle) that the document complies with.  This field is required when using `_where` or `_fields` query parameters.
+ */
+_schema?: string
+}
 /**
  * Object with document fields and their respective values.
  */
@@ -1004,7 +1030,12 @@ body: {
  * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
  */
 "DELETE /api/dataentities/:acronym/documents/:id": {
-
+searchParams: {
+/**
+ * Name of the [schema](https://developers.vtex.com/docs/guides/master-data-schema-lifecycle) that the document complies with.  This field is required when using `_where` or `_fields` query parameters.
+ */
+_schema?: string
+}
 }
 /**
  * Updates a subset of fields of a document, without impacting the other fields.
@@ -1026,6 +1057,12 @@ body: {
  * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
  */
 "PATCH /api/dataentities/:acronym/documents/:id": {
+searchParams: {
+/**
+ * Name of the [schema](https://developers.vtex.com/docs/guides/master-data-schema-lifecycle) that the document complies with.  This field is required when using `_where` or `_fields` query parameters.
+ */
+_schema?: string
+}
 /**
  * Object with the fields to be updated and their respective values.
  */
