@@ -26,39 +26,39 @@ const snippet = () => {
     event: "gtm.js",
   });
   const rounded = (n: number) => Number(n.toFixed(2));
-  const fixId = ({ item_id, item_group_id, _item_url, ...rest }: any) =>
-    item_group_id
-      ? { item_id: `${item_group_id}_${item_id}`, ...rest }
-      : { item_id, ...rest };
+  const fixId = ({ item_id, _item_url, ...rest }: any) => ({
+    item_id: typeof item_id === "string" ? item_id.split("_")[0] : item_id,
+    ...rest,
+  });
   const fixPrices = ({ price, discount = 0, quantity = 1, ...rest }: any) => ({
     ...rest,
     quantity,
     discount: rounded(discount),
     price: rounded(price),
   });
-globalThis.window.DECO.events.subscribe((event) => {
-  if (!event) {
-    return;
-  }
-
-  if (event.name === "deco") {
-    globalThis.window.dataLayer.push(event);
-    return;
-  }
-  const ecommerce: any = { ...event.params };
-
-  if (ecommerce && Array.isArray(ecommerce.items)) {
-    ecommerce.items = ecommerce.items
-      .map(fixId)
-      .map(fixPrices);
-  }
-  if (typeof ecommerce.value === "number") {
-    ecommerce.value = rounded(ecommerce.value);
-  }
-  globalThis.window.dataLayer.push({ ecommerce: null });
-  globalThis.window.dataLayer.push({ event: event.name, ecommerce });
-});
-  
+  const fixIndex = ({ index, ...rest }: any) => ({
+    ...rest,
+    index: typeof index === "number" ? Math.max(0, index) : index,
+  });
+  globalThis.window.DECO.events.subscribe((event) => {
+    if (!event) {
+      return;
+    }
+    if (event.name === "deco") {
+      globalThis.window.dataLayer.push(event);
+      return;
+    }
+    const ecommerce: any = { ...event.params };
+    if (ecommerce && Array.isArray(ecommerce.items)) {
+      ecommerce.items = ecommerce.items.map(fixId).map(fixPrices).map(fixIndex);
+    }
+    if (typeof ecommerce.value === "number") {
+      ecommerce.value = rounded(ecommerce.value);
+    }
+    globalThis.window.dataLayer.push({ ecommerce: null });
+    globalThis.window.dataLayer.push({ event: event.name, ecommerce });
+  });
+};
 function Section(
   { gtmId, hostname = "https://www.googletagmanager.com", loading = "defer" }:
     Props,
