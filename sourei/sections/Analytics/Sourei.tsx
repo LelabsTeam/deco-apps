@@ -38,7 +38,7 @@ const snippet = () => {
   });
   const fixIndex = ({ index, ...rest }: any) => ({
     ...rest,
-    index: typeof index === "number" ? Math.max(0, index) : index,
+    index: typeof index === "number" ? Math.max(1, index + 1) : index,
   });
   globalThis.window.DECO.events.subscribe((event) => {
     if (!event) {
