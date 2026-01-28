@@ -21,7 +21,6 @@ import {
   getSegmentFromBag,
   withSegmentCookie,
 } from "../../utils/segment.ts";
-import { pageTypesFromUrl } from "../../utils/intelligentSearch.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { getSkipSimulationBehaviorFromBag } from "../../utils/simulationBehavior.ts";
 import { slugify } from "../../utils/slugify.ts";

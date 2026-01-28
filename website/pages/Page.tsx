@@ -159,7 +159,12 @@ export const loader = async (
 ) => {
   const url = new URL(req.url);
   const devMode = url.searchParams.has("__d");
-  const appMode = url.searchParams.has("__app");
+  const appMode = url.searchParams.has("__app") || url.searchParams.has("asJson");;
+
+  if(appMode){
+    ctx.response.headers.set('Cache-Control', 'max-age=3500, public')
+  };
+  
   const unindexedDomain = noIndexedDomains.some((domain) =>
     url.origin.includes(domain)
   );
