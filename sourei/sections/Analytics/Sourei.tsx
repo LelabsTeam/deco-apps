@@ -26,17 +26,20 @@ const snippet = () => {
     event: "gtm.js",
   });
   const rounded = (n: number) => Number(n.toFixed(2));
-  const fixId = ({ item_id, item_group_id, _item_url, ...rest }: any) =>
-    item_group_id
-      ? { item_id: `${item_group_id}_${item_id}`, ...rest }
-      : { item_id, ...rest };
+  const fixId = ({ item_id, _item_url, ...rest }: any) => ({
+    item_id: typeof item_id === "string" ? item_id.split("_")[0] : item_id,
+    ...rest,
+  });
   const fixPrices = ({ price, discount = 0, quantity = 1, ...rest }: any) => ({
     ...rest,
     quantity,
     discount: rounded(discount),
-    price: rounded(price + discount),
+    price: rounded(price),
   });
-  const fixIndex = ({ index, ...rest }: any) => ({ ...rest, index: index + 1 });
+  const fixIndex = ({ index, ...rest }: any) => ({
+    ...rest,
+    index: typeof index === "number" ? Math.max(1, index + 1) : index,
+  });
   globalThis.window.DECO.events.subscribe((event) => {
     if (!event) {
       return;
