@@ -39,7 +39,7 @@ export const withDefaultFacets = (
 };
 
 export const toPath = (facets: SelectedFacet[]) =>
-  facets.map(({ key, value }) => `${key}/${value}`).join("/");
+  facets.map(({ key, value }) => key ? `${key}/${value}` : value).join("/");
 
 interface Params {
   query: string;
