@@ -1,23 +1,63 @@
-import {
+import { type SectionProps } from "@deco/deco";
+import { useScriptAsDataURI } from "@deco/deco/hooks";
+import type {
   AddToCartEvent,
   AnalyticsItem,
   SelectItemEvent,
 } from "../../../commerce/types.ts";
-import { AppContext } from "../../mod.ts";
-import { getISCookiesFromBag } from "../../utils/intelligentSearch.ts";
-import { SPEvent } from "../../utils/types.ts";
-import { type SectionProps } from "@deco/deco";
-import { useScriptAsDataURI } from "@deco/deco/hooks";
-interface ISCookies {
-  // deno-lint-ignore no-explicit-any
-  anonymous: any;
-  // deno-lint-ignore no-explicit-any
-  session: any;
+import type { AppContext } from "../../mod.ts";
+import {
+  ANONYMOUS_COOKIE,
+  SESSION_COOKIE,
+} from "../../utils/intelligentSearch.ts";
+import type { SPEvent } from "../../utils/types.ts";
+
+interface SnippetProps {
+  account: string;
+  anonymousCookie: string;
+  sessionCookie: string;
 }
-const snippet = (account: string, agent: string, cookies: ISCookies | null) => {
+
+const snippet = ({ account, anonymousCookie, sessionCookie }: SnippetProps) => {
+  const ONE_YEAR_SECS = 365 * 24 * 3600;
+  const THIRTY_MIN_SECS = 30 * 60;
+
+  const getCookie = (name: string): string | null => {
+    const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+    return match ? match[1] : null;
+  };
+
+  const setCookie = (name: string, value: string, maxAge: number) => {
+    document.cookie =
+      `${name}=${value};path=/;max-age=${maxAge};secure;SameSite=Lax`;
+  };
+
+  const getOrCreateISCookies = () => {
+    let anonymous = getCookie(anonymousCookie);
+    if (!anonymous) {
+      anonymous = crypto.randomUUID();
+      setCookie(anonymousCookie, anonymous, ONE_YEAR_SECS);
+    }
+
+    let session = getCookie(sessionCookie);
+    if (!session) {
+      session = crypto.randomUUID();
+    }
+    // Always re-set session cookie to simulate sliding expiration
+    setCookie(sessionCookie, session, THIRTY_MIN_SECS);
+
+    return { anonymous, session };
+  };
+
+  const cookies = getOrCreateISCookies();
+
   const url = new URL(globalThis.location.href);
   const isSearch = url.searchParams.get("q");
   const apiUrl = `https://sp.vtex.com/event-api/v1/${account}/event`;
+  const baseProps = {
+    agent: navigator.userAgent,
+    ...cookies,
+  };
   const eventFetch = (props: SPEvent) => {
     fetch(apiUrl, {
       method: "POST",
@@ -29,10 +69,6 @@ const snippet = (account: string, agent: string, cookies: ISCookies | null) => {
         "Content-Type": "application/json",
       },
     });
-  };
-  const baseProps = {
-    agent,
-    ...cookies,
   };
   // deno-lint-ignore no-explicit-any
   function isSelectItemEvent(event: any): event is SelectItemEvent {
@@ -91,22 +127,25 @@ const snippet = (account: string, agent: string, cookies: ISCookies | null) => {
     }
   });
 };
+
 export default function VtexAnalytics(
-  { account, agent, cookies }: SectionProps<typeof loader>,
+  { account }: SectionProps<typeof loader>,
 ) {
   return (
     <script
       type="text/javascript"
       defer
-      src={useScriptAsDataURI(snippet, account, agent, cookies)}
+      src={useScriptAsDataURI(snippet, {
+        account,
+        anonymousCookie: ANONYMOUS_COOKIE,
+        sessionCookie: SESSION_COOKIE,
+      })}
     />
   );
 }
-export const loader = (_props: unknown, req: Request, ctx: AppContext) => {
-  const cookies = getISCookiesFromBag(ctx);
+
+export const loader = (_props: unknown, _req: Request, ctx: AppContext) => {
   return {
     account: ctx.account,
-    agent: req.headers.get("user-agent") || "deco-sites/apps",
-    cookies,
   };
 };

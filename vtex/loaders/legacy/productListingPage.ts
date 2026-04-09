@@ -122,6 +122,7 @@ const IS_TO_LEGACY: Record<string, LegacySort> = {
   "price:asc": "OrderByPriceASC",
   "orders:desc": "OrderByTopSaleDESC",
   "name:desc": "OrderByNameDESC",
+  "name:asc": "OrderByNameASC",
   "release:desc": "OrderByReleaseDateDESC",
   "discount:desc": "OrderByBestDiscountDESC",
   "relevance:desc": "OrderByScoreDESC",
@@ -208,11 +209,10 @@ const loader = async (
     ? Number(url.searchParams.get("page")) - currentPageoffset
     : 0;
   const page = props.page || pageParam;
-  const O = (url.searchParams.get("O") as LegacySort) ??
+  const O: LegacySort = (url.searchParams.get("O") as LegacySort) ??
     IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
-    url.searchParams.get("sort") ??
     props.sort ??
-    sortOptions[0].value;
+    sortOptions[0].value as LegacySort;
   const fq = [
     ...new Set([
       ...(props.fq ? [props.fq] : []),
@@ -450,8 +450,12 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(props.pageHref || req.url);
 
   const searchTerm = url.searchParams.get("ft") || url.searchParams.get("q");
+  const hasMap = url.search.includes("map=");
   const cachedSearchTerms = ctx.cachedSearchTerms ?? [];
-  if (searchTerm && !cachedSearchTerms.includes(searchTerm.toLowerCase())) {
+  if (
+    hasMap ||
+    (searchTerm && !cachedSearchTerms.includes(searchTerm.toLowerCase()))
+  ) {
     return null;
   }
   const fq = [

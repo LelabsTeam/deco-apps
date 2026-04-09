@@ -61,6 +61,15 @@ export const isAnonymous = (
     !regionId;
 };
 
+export const isCacheableSegment = (ctx: AppContext) => {
+  const payload = getSegmentFromBag(ctx)?.payload;
+  if (payload?.channelPrivacy === "private") return false;
+
+  if (!payload) return true;
+  const { campaigns, priceTables, regionId } = payload;
+  return !campaigns && !priceTables && !regionId;
+};
+
 const setSegmentInBag = (ctx: AppContext, data: WrappedSegment) =>
   ctx?.bag?.set(SEGMENT, data);
 
@@ -153,7 +162,13 @@ const serialize = ({
   return btoa(JSON.stringify(seg));
 };
 
-const parse = (cookie: string) => JSON.parse(atob(cookie));
+const parse = (cookie: string) => {
+  try {
+    return JSON.parse(atob(cookie));
+  } catch {
+    return null;
+  }
+};
 
 const SEGMENT_QUERY_PARAMS = [
   "utmi_campaign" as const,
@@ -212,6 +227,15 @@ export const setSegmentBag = (
     : {};
   const segmentFromRequest = buildSegmentFromRequest(req);
 
+  const locale = {
+    ...(ctx.defaultSegment?.countryCode && {
+      countryCode: ctx.defaultSegment.countryCode,
+    }),
+    ...(ctx.defaultSegment?.cultureInfo && {
+      cultureInfo: ctx.defaultSegment.cultureInfo,
+    }),
+  };
+
   const segment = {
     channel: ctx.salesChannel,
     ...DEFAULT_SEGMENT,
@@ -219,11 +243,14 @@ export const setSegmentBag = (
     ...segmentFromCookie,
     ...segmentFromSalesChannelCookie,
     ...segmentFromRequest,
+    ...locale,
   };
   const token = serialize(segment);
   setSegmentInBag(ctx, { payload: segment, token });
 
-  // If the user came from a sales channel in the URL, we set the cookie
+  // Always persist sales channel when it comes from request params so the
+  // browser carries it across navigation. The CDN varies its cache key by
+  // VTEXSC, so setting this cookie does not prevent CDN caching.
   if (segmentFromRequest.channel) {
     setCookie(ctx.response.headers, {
       value: `sc=${segmentFromRequest.channel}`,
@@ -236,8 +263,9 @@ export const setSegmentBag = (
   const hostname = (new URL(req.url)).hostname;
   const cookieDomain = hostname.startsWith(".") ? hostname : `.${hostname}`;
 
-  // Avoid setting cookie when segment from request matches the one generated
-  if (vtex_segment !== token) {
+  // Only set vtex_segment when the channel is non-default so that default-SC
+  // responses remain cacheable by the CDN without a Set-Cookie header.
+  if (vtex_segment !== token && !isAnonymous(ctx)) {
     setCookie(ctx.response.headers, {
       value: token,
       name: SEGMENT_COOKIE_NAME,

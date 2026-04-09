@@ -1,8 +1,4 @@
-import {
-  integer,
-  sqliteTable,
-  text,
-} from "npm:drizzle-orm@0.30.10/sqlite-core";
+import { integer, sqliteTable, text } from "npm:drizzle-orm@0.43.1/sqlite-core";
 
 export const rating = sqliteTable("rating", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -18,9 +14,9 @@ export const review = sqliteTable("review", {
   author: text("author", { mode: "json" }),
   datePublished: (text("datePublished")).notNull(),
   dateModified: (text("dateModified")).notNull(),
-  reviewHeadline: (text("reviewHeadline")),
+  reviewHeadline: text("reviewHeadline"),
   reviewBody: (text("reviewBody")).notNull(),
-  additionalType: (text("additionalType")),
+  additionalType: text("additionalType"),
   isAnonymous: integer("isAnonymous", { mode: "boolean" }),
 });
 

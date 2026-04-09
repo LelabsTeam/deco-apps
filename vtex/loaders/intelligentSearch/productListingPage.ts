@@ -515,6 +515,12 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     return null;
   }
 
+  if (
+    url.search.includes("filter.")
+  ) {
+    return null;
+  }
+
   const segment = ctx.advancedConfigs?.removeUTMFromCacheKey
     ? getSegmentCacheKeyWithoutUTM(ctx)
     : getSegmentFromBag(ctx)?.token;
