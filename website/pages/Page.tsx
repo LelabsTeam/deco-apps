@@ -63,6 +63,7 @@ export function renderSection(section: Props["sections"][number]) {
 class ErrorBoundary extends Component<{
   // deno-lint-ignore no-explicit-any
   fallback: ComponentFunc<any>;
+  currentPage: string;
 }> {
   override state = { error: null as Error | null };
   // deno-lint-ignore no-explicit-any
@@ -72,7 +73,7 @@ class ErrorBoundary extends Component<{
   render() {
     if (this.state.error) {
       const err = this?.state?.error;
-      const msg = `rendering: ${this.props} ${err?.stack}`;
+      const msg = `rendering: ${this.props} ${err?.stack} at page ${this.props.currentPage}`;
       logger.error(msg);
       console.error(msg);
     }
@@ -111,6 +112,7 @@ function Page(
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
+
   return (
     <>
       {unindexedDomain && (
@@ -132,6 +134,7 @@ function Page(
                   : "") || ""}
               />
             )}
+          currentPage={deco.page.pathTemplate ?? "unknown"}
       >
         {seo && renderSection(seo)}
         <LiveControls
