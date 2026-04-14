@@ -22,7 +22,7 @@ import { SEOSection } from "../components/Seo.tsx";
 import LiveControls from "../components/_Controls.tsx";
 import { AppContext } from "../mod.ts";
 
-const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
+const noIndexedDomains = ["decocdn.com", "deno.dev"];
 
 const ONEDOLLAR_ENABLED = Deno.env.get("ONEDOLLAR_ENABLED") !== "false";
 const ONEDOLLAR_COLLECTOR = Deno.env.get("ONEDOLLAR_COLLECTOR");
